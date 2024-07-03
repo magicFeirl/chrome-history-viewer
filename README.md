@@ -12,3 +12,13 @@
 
 后端：按上面给出的思路即可，主要是文件读取和 SQLite 查询
 前端：展示必要字段，通过接口调用后端打开浏览器
+
+
+**运行**
+
+Windows 下点击 run.bat 会自动打开前端网页和后端；或者手动打开 html/index.html 和运行 `python backend/app.py`，项目根目录下的 main.py 用于导出 csv
+
+
+**Screenshot**
+
+![screenshot](./docs/1.png)

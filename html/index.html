@@ -294,7 +294,8 @@
   </div>
 
   <script type="module">
-    import { createApp, ref, computed } from './js/vue.esm-browser.js'
+    // import { createApp, ref, computed } from './js/vue.esm-browser.js'
+    import { createApp, ref, computed } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
     // 添加一个状态，需要修改 ROW_STATE、ROW_STATE_MAP、和 search 中的部分代码 还有 css
     // 应该把状态的样式、优先级、文本内容全部放到一个 object 里面，状态判断用 object 提供的函数
     const ROW_STATE = {
@@ -341,7 +342,7 @@
 
     createApp({
       setup() {
-        const query = ref('1loe1oaLI7_aUrTKsFwYW4OANJn2JhWKT')
+        const query = ref()
         const data = ref([])
         const state = ref({
           showUnavailable: false,
@@ -371,7 +372,7 @@
         const loading = ref(false)
         const search = () => {
           if (!query.value) {
-            alert('请输入要搜索的 URL')
+            // alert('请输入要搜索的 URL')
             return
           }
 
@@ -394,6 +395,10 @@
             }
 
             data.value.forEach(item => {
+              // item['browser']['username'] = 'Test'
+              // item['browser']['email'] = 'example@gmail.com'
+              // item['browser']['default_name'] = 'Example'
+
               item.lastLink = item.links.length ? item.links[0] : default_link
               const { last_visit_day_since_now: last_day, id } = item.lastLink
 
@@ -409,6 +414,7 @@
 
               for (const link of item.links) {
                 link.last_visit_time = link.last_visit_time.replace('T', ' ').replace(/\.\d+/, '')
+                // link["title"] = "Example"
               }
               if (id === '-') {
                 // unknown
