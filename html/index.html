@@ -247,7 +247,8 @@
         <label for="account-row-count">单账号条数</label>
         <input type="number" max="10" min="1" id="account-row-count" v-model="state.accountRowCount">
         <input @keyup.enter="search" id="search-inp" type="text" v-model="query">
-        <button @click="search" id="search-btn"><span class="iconfont icon-refresh"></span>refresh/search</button>
+        <button :disabled="!query" @click="search" id="search-btn"><span
+            class="iconfont icon-refresh"></span>refresh/search</button>
       </header>
     </nav>
     <main>
@@ -280,7 +281,7 @@
               <td>{{item.browser.username}}</td>
               <td>{{item.browser.default_name}}</td>
               <td class="info-text ellipsis">{{item.browser.email}}</td>
-              <td class="url-text ellipsis">{{link.url}}</td>
+              <td class="url-text ellipsis">{{link.url || '-' }}</td>
               <td class="info-text ellipsis">{{link.title}}</td>
               <td>{{link.visit_count}}</td>
               <td>{{link.last_visit_time}}</td>
@@ -342,7 +343,8 @@
 
     createApp({
       setup() {
-        const query = ref()
+        const query = ref('1loe1oaLI7_aUrTKsFwYW4OANJn2JhWKT')
+
         const data = ref([])
         const state = ref({
           showUnavailable: false,
@@ -372,7 +374,7 @@
         const loading = ref(false)
         const search = () => {
           if (!query.value) {
-            // alert('请输入要搜索的 URL')
+            alert('请输入要搜索的 URL')
             return
           }
 
@@ -387,7 +389,7 @@
             data.value = _data
             const default_link = {
               id: '-',
-              url: '-',
+              url: '',
               title: '-',
               visit_count: '-',
               last_visit_time: '-',
@@ -445,12 +447,13 @@
         search()
 
         const openChrome = async (browser, link) => {
-          if (link.state_type === ROW_STATE.unknown) {
-            return
-          }
+          // if (link.state_type === ROW_STATE.unknown) {
+          //   return
+          // }
 
+		  
           const { profile_dir } = browser
-          const { url } = link
+          const url = link.url || 'chrome://history/'
           const resp = await request(`/open/${browser.profile_dir}?url=${url}`)
           const result = await resp.json()
         }
