@@ -51,6 +51,9 @@ async def root(qs: str = Query()) -> List[Data]:
     data = []
 
     for item in find_link_last_visit_time(qs):
+        if not item:
+            continue
+            
         data.append(Data(browser=item['browser'], links=item['links']))
 
     return data

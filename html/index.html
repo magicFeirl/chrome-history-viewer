@@ -225,6 +225,14 @@
       padding: 5px;
       border-radius: 5px;
     }
+
+    fieldset {
+      outline: 1px solid rgb(231, 231, 231);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 
@@ -234,21 +242,34 @@
       <header>
         <span class="title">Colab usage viewer</span>
         <div style="flex: 1;"></div>
-        <label for="hide-available">显示可用</label>
-        <input type="checkbox" id="hide-available" v-model="state.showAvailable">
+        <fieldset>
 
-        <label for="hide-ban">显示封号中<span class="ban-tooltip">?</span></label>
-        <input type="checkbox" id="hide-ban" v-model="state.showBan">
+          <label for="hide-available">显示可用</label>
+          <input type="checkbox" id="hide-available" v-model="state.showAvailable">
 
-        <label for="hide-unknow">显示未知</label>
-        <input type="checkbox" id="hide-unknow" v-model="state.showUnknown">
-        <label for="hide-unavailable">显示不可用</label>
-        <input type="checkbox" id="hide-unavailable" v-model="state.showUnavailable">
-        <label for="account-row-count">单账号条数</label>
-        <input type="number" max="10" min="1" id="account-row-count" v-model="state.accountRowCount">
-        <input @keyup.enter="search" id="search-inp" type="text" v-model="query">
-        <button :disabled="!query" @click="search" id="search-btn"><span
-            class="iconfont icon-refresh"></span>refresh/search</button>
+          <label for="hide-ban">显示封号中<span class="ban-tooltip">?</span></label>
+          <input type="checkbox" id="hide-ban" v-model="state.showBan">
+
+          <label for="hide-unknow">显示未知</label>
+          <input type="checkbox" id="hide-unknow" v-model="state.showUnknown">
+          <label for="hide-unavailable">显示不可用</label>
+          <input type="checkbox" id="hide-unavailable" v-model="state.showUnavailable">
+          <label for="account-row-count">单账号条数</label>
+          <input type="number" max="10" min="1" id="account-row-count" v-model="state.accountRowCount">
+        </fieldset>
+
+        <fieldset>
+          <input type="number" max="100" min="1" id="open-coun" v-model="state.openCount">
+          <label for="open-link">链接</label>
+          <input type="text" v-model="state.openLink">
+          <button @click="openChromeOneByOne">打开</button>
+        </fieldset>
+
+        <fieldset>
+          <input @keyup.enter="search" id="search-inp" type="text" v-model="query">
+          <button :disabled="!query" @click="search" id="search-btn"><span
+              class="iconfont icon-refresh"></span>refresh/search</button>
+        </fieldset>
       </header>
     </nav>
     <main>
@@ -350,8 +371,10 @@
           showUnavailable: false,
           showAvailable: true,
           showBan: false,
-          showUnknown: false,
+          showUnknown: true,
           accountRowCount: 1,
+          openCount: 1,
+          openLink: ""
         })
 
         const filteredData = computed(() => {
@@ -450,12 +473,24 @@
           // if (link.state_type === ROW_STATE.unknown) {
           //   return
           // }
-
-		  
           const { profile_dir } = browser
-          const url = link.url || 'chrome://history/'
+          const url = link?.url || 'chrome://history/'
           const resp = await request(`/open/${browser.profile_dir}?url=${url}`)
           const result = await resp.json()
+        }
+
+        const openChromeOneByOne = async () => {
+          let openCount = 0
+          const openRows = data.value.filter(item => [ROW_STATE.available, ROW_STATE.unknown].includes(item.lastLink.state_type))
+
+          for (const { browser } of openRows) {
+            openCount++
+            await openChrome(browser, { url: state.value.openLink })
+
+            if (openCount >= state.value.openCount) {
+              break
+            }
+          }
         }
 
         return {
@@ -466,6 +501,7 @@
           state,
           loading,
           openChrome,
+          openChromeOneByOne,
           getRowStateTypeText(row) {
             // console.log(row, ROW_STATE_MAP);
             return ROW_STATE_MAP[row.state_type].text

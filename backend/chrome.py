@@ -23,6 +23,10 @@ def find_link_last_visit_time(link_part: str):
     for dir in profiles:
         dirname = os.path.basename(dir)
         config_file = os.path.join(dir, 'Preferences')
+        
+        if not os.path.exists(config_file):
+            continue
+            
         result = {}
         results.append(result)
 
@@ -82,7 +86,7 @@ def find_link_last_visit_time(link_part: str):
                 history_db.close()
 
     def sort_by_day(item):
-        if item['links']:
+        if 'links' in item and item['links']:
             return min(l['last_visit_day_since_now'] for l in item['links'])
         else:
             return 999
@@ -96,11 +100,19 @@ def open_chrome_with_profile(profile_name, url: str = ""):
     chrome_path = config.CHROME_EXE_PATH
     # 用户数据目录
     user_data_dir = config.CHROME_DATA_DIR
-
-    # 启动 Chrome 并指定用户数据目录和配置文件夹
-    return subprocess.run([
-        chrome_path,
-        f"--user-data-dir={user_data_dir}",
-        f"--profile-directory={profile_name}",
-        url
-    ])
+    username = os.environ['USERNAME']
+    
+    for path in [user_data_dir, rf'C:\Users\{username}\AppData\Local\Google']:
+        # 启动 Chrome 并指定用户数据目录和配置文件夹
+        result = subprocess.run([
+            chrome_path,
+            f"--user-data-dir={path}",
+            f"--profile-directory={profile_name}",
+            url
+        ])
+        
+        print(result)
+        
+        if result.returncode == 0:
+            break
+        
