@@ -114,7 +114,8 @@ def find_link_last_visit_time(link_parts: List[str]):
                 )
 
         except sqlite3.OperationalError as e:
-            links.append(create_link_description(-1, "", "占用中", 0))
+            last_visit_time = datetime.fromtimestamp(os.path.getmtime(db_path))
+            links.append(create_link_description(-1, "", "占用中", 1, last_visit_time))
             print(e)
         finally:
             history_db.close()
