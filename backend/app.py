@@ -49,6 +49,7 @@ async def open(profile_name: str, url: str = Query()):
 @app.get('/')
 async def root(qs: str = Query()) -> List[Data]:
     data = []
+    qs = [s for s in qs.split('$$$') if s.strip()]
 
     for item in find_link_last_visit_time(qs):
         if not item:

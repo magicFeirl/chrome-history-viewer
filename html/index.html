@@ -1,519 +1,604 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Colab Usage Viewer</title>
+    <link
+      rel="stylesheet"
+      href="https://at.alicdn.com/t/c/font_4607511_38pblj0nv4a.css"
+    />
+    <style>
+      body {
+        margin: 0;
+        background-color: rgb(245, 245, 245);
+      }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Colab usage viewer</title>
-  <link rel="stylesheet" href="https://at.alicdn.com/t/c/font_4607511_38pblj0nv4a.css">
-  <style>
-    body {
-      margin: 0;
-      background-color: rgb(245, 245, 245);
-    }
+      nav {
+        padding: 15px 5px;
+        border-bottom: 1px solid #ccc;
+        position: sticky;
+        top: 0;
+        background-color: rgb(245, 245, 245);
+        z-index: 100;
+      }
 
-    nav {
-      padding: 15px 5px;
-      border-bottom: 1px solid #ccc;
-      position: sticky;
-      top: 0;
-      background-color: rgb(245, 245, 245);
-      z-index: 100;
-    }
+      nav header {
+        display: flex;
+        align-items: center;
+      }
 
-    nav header {
-      display: flex;
-      align-items: center;
-    }
+      .search-inp {
+        min-width: 15rem;
+        margin-right: 2px;
+        border-radius: 2px;
+      }
 
-    #search-inp {
-      min-width: 15rem;
-      margin-right: 2px;
-      border-radius: 2px;
-    }
+      button {
+        background-color: rgb(25, 118, 210);
+        color: white;
+        font-size: 12px;
+        border: none;
+        border-radius: 2px;
+        height: 1.3rem;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
 
-    button {
-      background-color: rgb(25, 118, 210);
-      color: white;
-      font-size: 12px;
-      border: none;
-      border-radius: 2px;
-      height: 1.3rem;
-      cursor: pointer;
-    }
+      button:hover {
+        background-color: rgb(27, 130, 234);
+      }
 
-    header .title {
-      font-size: 16px;
-      font-weight: bold;
-    }
+      header .title {
+        font-size: 16px;
+        font-weight: bold;
+      }
 
-    header input[type="checkbox"] {
-      margin-bottom: -1px;
-    }
+      header input[type="checkbox"] {
+        margin-bottom: -1px;
+      }
 
-    header label {
-      cursor: pointer;
-      transition: color 0.2s ease;
-      margin-left: 12px;
-    }
+      fieldset label {
+        cursor: pointer;
+        transition: color 0.2s ease;
+        margin-right: 12px;
+      }
 
-    header input {
-      margin-right: 8px;
-    }
+      header input {
+        margin-right: 16px;
+      }
 
-    header label:hover {
-      color: rgb(25, 118, 210);
-    }
+      header label:hover {
+        color: rgb(25, 118, 210);
+      }
 
-    main {
-      position: relative;
-    }
+      main {
+        position: relative;
+      }
 
-    .loading-mask {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-      z-index: 100;
+      .loading-mask {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        z-index: 100;
 
-      color: #ccc;
-      font-size: 18px;
-    }
+        color: #ccc;
+        font-size: 18px;
+      }
 
-    .loading-mask.show {
-      visibility: visible;
-      opacity: 1;
-    }
+      .loading-mask.show {
+        visibility: visible;
+        opacity: 1;
+      }
 
-    main>table {
-      width: 100%;
-      border-spacing: 0;
-    }
+      main > table {
+        width: 100%;
+        border-spacing: 0;
+      }
 
-    table>thead th {
-      background-color: rgb(245, 245, 245);
-      height: 35px;
-      color: #444;
-    }
+      table > thead th {
+        background-color: rgb(245, 245, 245);
+        height: 35px;
+        color: #444;
+      }
 
-    tbody tr {
-      transition: background-color 0.2s ease;
-    }
+      tbody tr {
+        transition: background-color 0.2s ease;
+      }
 
-    tbody tr:hover {
-      cursor: pointer;
-      background-color: rgb(231, 231, 231);
-    }
+      tbody tr:hover {
+        cursor: pointer;
+        background-color: rgb(231, 231, 231);
+      }
 
-    tbody tr:hover td {
-      color: #444;
-    }
+      tbody tr:hover td {
+        color: #444;
+      }
 
-    table>tbody td {
-      color: #666;
-      height: 35px;
-      font-size: 14px;
-      text-align: center;
-    }
+      table > tbody td {
+        color: #666;
+        height: 35px;
+        font-size: 14px;
+        text-align: center;
+      }
 
-    thead th,
-    tbody td {
-      border-bottom: 1px solid #ccc;
-    }
+      thead th,
+      tbody td {
+        border-bottom: 1px solid #ccc;
+      }
 
-    .iconfont {
-      margin-right: 2px;
-      font-size: inherit;
-    }
+      .iconfont {
+        margin-right: 2px;
+        font-size: inherit;
+      }
 
-    .state {
-      display: inline-block;
-      padding: 2px 4px;
-      border-radius: 5px;
-      color: white;
-      font-size: 12px;
-    }
+      .state {
+        display: inline-block;
+        padding: 2px 4px;
+        border-radius: 5px;
+        color: white;
+        font-size: 12px;
+      }
 
-    .row.recent .state {
-      background-color: rgba(255, 166, 0, 0.8);
-    }
+      .row.recent .state {
+        background-color: rgba(255, 166, 0, 0.8);
+      }
 
-    .row.available .state {
-      background-color: rgba(0, 128, 0, 0.7);
-    }
+      .row.available .state {
+        background-color: rgba(0, 128, 0, 0.7);
+      }
 
-    .row.unavailable .state {
-      background-color: rgba(255, 0, 0, 0.7);
-    }
+      .row.unavailable .state,
+      .row.disabled .state {
+        background-color: rgba(255, 0, 0, 0.7);
+      }
 
-    .row.ban .state {
-      background-color: rgba(139, 0, 0, 0.7);
-    }
+      .row.ban .state {
+        background-color: rgba(139, 0, 0, 0.7);
+      }
 
-    .row.unknown .state {
-      background-color: rgba(128, 128, 128, 0.7);
-    }
+      .row.unknown .state {
+        background-color: rgba(128, 128, 128, 0.7);
+      }
 
-    .ellipsis {
-      text-overflow: ellipsis;
-      overflow: hidden;
-      word-break: keep-all;
-      text-wrap: nowrap;
-    }
+      .row.disabled {
+        background-color: #bbb;
+        color: #aaa;
+        pointer-events: none;
+      }
 
-    .url-text {
-      max-width: 6rem;
-    }
+      .row.disabled .enable {
+        pointer-events: all;
+      }
 
-    .info-text {
-      max-width: 8rem;
-    }
+      .ellipsis {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        word-break: keep-all;
+        text-wrap: nowrap;
+      }
 
-    .ban-tooltip {
-      color: #ccc;
-      cursor: pointer;
-      display: inline-block;
-      border: 1px solid #ccc;
-      border-radius: 50%;
-      width: 14px;
-      height: 14px;
-      text-align: center;
-      line-height: 14px;
-      margin-left: 2px;
-      font-size: 12px;
-      position: relative;
-      z-index: 1;
-    }
+      .url-text {
+        max-width: 6rem;
+      }
 
-    .ban-tooltip::before,
-    .ban-tooltip::after {
-      content: "";
-      position: absolute;
-      display: block;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-      user-select: none;
-    }
+      .info-text {
+        max-width: 8rem;
+      }
 
-    .ban-tooltip:hover::before,
-    .ban-tooltip:hover::after {
-      opacity: 1;
-    }
+      .ban-tooltip {
+        color: #ccc;
+        cursor: pointer;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 50%;
+        width: 14px;
+        height: 14px;
+        text-align: center;
+        line-height: 14px;
+        margin-left: 2px;
+        font-size: 12px;
+        position: relative;
+        z-index: 1;
+        margin-top: -2px;
+      }
 
-    .ban-tooltip:hover::before {
-      content: "";
-      border: 8px solid transparent;
-      border-bottom-color: rgba(0, 0, 0, 0.7);
-      bottom: -8px;
-    }
+      .ban-tooltip::before,
+      .ban-tooltip::after {
+        content: "";
+        position: absolute;
+        display: block;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        user-select: none;
+      }
 
-    .ban-tooltip:hover::after {
-      bottom: -2rem;
-      left: -10rem;
-      content: "\"用户名列\"含有 \"appeal\" 或者 \"need verify\" 字段则视为被封号";
-      background-color: rgba(0, 0, 0, 0.7);
-      color: white;
-      text-wrap: nowrap;
-      padding: 5px;
-      border-radius: 5px;
-    }
+      .ban-tooltip:hover::before,
+      .ban-tooltip:hover::after {
+        opacity: 1;
+      }
 
-    fieldset {
-      outline: 1px solid rgb(231, 231, 231);
-      padding: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  </style>
-</head>
+      .ban-tooltip:hover::before {
+        content: "";
+        border: 8px solid transparent;
+        border-bottom-color: rgba(0, 0, 0, 0.7);
+        bottom: -8px;
+      }
 
-<body>
-  <div id="app">
-    <nav>
-      <header>
-        <span class="title">Colab usage viewer</span>
-        <div style="flex: 1;"></div>
-        <fieldset>
+      .ban-tooltip:hover::after {
+        bottom: -1rem;
+        left: -10rem;
+        content: '"用户名列"含有 "appeal" 或者 "need verify" 字段则视为被禁用';
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        text-wrap: nowrap;
+        padding: 5px;
+        border-radius: 5px;
+      }
 
-          <label for="hide-available">显示可用</label>
-          <input type="checkbox" id="hide-available" v-model="state.showAvailable">
+      fieldset {
+        outline: 1px solid rgb(231, 231, 231);
+        padding: 2px 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-          <label for="hide-ban">显示封号中<span class="ban-tooltip">?</span></label>
-          <input type="checkbox" id="hide-ban" v-model="state.showBan">
+      header fieldset label {
+        margin-right: 0;
+      }
 
-          <label for="hide-unknow">显示未知</label>
-          <input type="checkbox" id="hide-unknow" v-model="state.showUnknown">
-          <label for="hide-unavailable">显示不可用</label>
-          <input type="checkbox" id="hide-unavailable" v-model="state.showUnavailable">
-          <label for="account-row-count">单账号条数</label>
-          <input type="number" max="10" min="1" id="account-row-count" v-model="state.accountRowCount">
-        </fieldset>
+      fieldset #open-link {
+        min-width: 20rem;
+      }
 
-        <fieldset>
-          <input type="number" max="100" min="1" id="open-coun" v-model="state.openCount">
-          <label for="open-link">链接</label>
-          <input type="text" v-model="state.openLink">
-          <button @click="openChromeOneByOne">打开</button>
-        </fieldset>
+      .filter {
+        margin-top: 5px;
+      }
 
-        <fieldset>
-          <input @keyup.enter="search" id="search-inp" type="text" v-model="query">
-          <button :disabled="!query" @click="search" id="search-btn"><span
-              class="iconfont icon-refresh"></span>refresh/search</button>
-        </fieldset>
-      </header>
-    </nav>
-    <main>
-      <div class="loading-mask" :class="loading ? 'show' : ''">
-        Loading...
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th><span class="iconfont icon-state"></span>状态</th>
-            <th><span class="iconfont icon-folder"></span>Profile文件夹名</th>
-            <th><span class="iconfont icon-custom-user"></span>用户名</th>
-            <th><span class="iconfont icon-custom-user"></span>默认用户名</th>
-            <th><span class="iconfont icon-email"></span>邮箱</th>
-            <th><span class="iconfont icon-link"></span>URL</th>
-            <th><span class="iconfont icon-title"></span>标题</th>
-            <th><span class="iconfont icon-count"></span>访问次数</th>
-            <th><span class="iconfont icon-date"></span>最后访问时间</th>
-            <th><span class="iconfont icon-date"></span>最后访问距今(天)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <template v-for="item in filteredData" :key="item.browser.profile_dir">
-            <tr @click="openChrome(item.browser, link)" v-for="(link, idx) in item.computedLinks" :key="link.id"
-              class="row" :class="getRowStateTypeStyle(item.lastLink)">
-              <td>
-                <span v-if="idx === 0" class="state">{{ getRowStateTypeText(item.lastLink) }}</span>
-              </td>
-              <td>{{item.browser.profile_dir}}</td>
-              <td>{{item.browser.username}}</td>
-              <td>{{item.browser.default_name}}</td>
-              <td class="info-text ellipsis">{{item.browser.email}}</td>
-              <td class="url-text ellipsis">{{link.url || '-' }}</td>
-              <td class="info-text ellipsis">{{link.title}}</td>
-              <td>{{link.visit_count}}</td>
-              <td>{{link.last_visit_time}}</td>
-              <td>{{link.last_visit_day_since_now}}</td>
+      .filter fieldset {
+        justify-content: start;
+        padding: 2px;
+      }
+
+      .filter fieldset input {
+        flex: 1 1 auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <nav>
+        <header>
+          <span class="title">Colab Usage Viewer</span>
+          <div style="flex: 1"></div>
+          <fieldset>
+            <label for="hide-available">显示可用</label>
+            <input
+              type="checkbox"
+              id="hide-available"
+              v-model="state.showAvailable"
+            />
+
+            <label for="hide-ban"
+              >显示禁用中<span class="ban-tooltip">?</span></label
+            >
+            <input type="checkbox" id="hide-ban" v-model="state.showBan" />
+
+            <label for="hide-unknow">显示未知</label>
+            <input
+              type="checkbox"
+              id="hide-unknow"
+              v-model="state.showUnknown"
+            />
+            <label for="hide-unavailable">显示不可用</label>
+            <input
+              type="checkbox"
+              id="hide-unavailable"
+              v-model="state.showUnavailable"
+            />
+            <label for="account-row-count">单账号条数</label>
+            <input
+              type="number"
+              max="10"
+              min="1"
+              id="account-row-count"
+              v-model="state.accountRowCount"
+            />
+          </fieldset>
+
+          <fieldset>
+            <label for="open-count">数量</label>
+            <input
+              type="number"
+              max="100"
+              min="1"
+              id="open-count"
+              v-model="state.openCount"
+            />
+            <label for="open-link">链接</label>
+            <input
+              placeholder="link"
+              id="open-link"
+              type="text"
+              v-model="state.openLink"
+            />
+            <button @click="openChromeOneByOne">打开</button>
+          </fieldset>
+        </header>
+        <section class="filter">
+          <fieldset>
+            <input
+              v-for="i in 3"
+              :key="i"
+              @keyup.enter="search"
+              class="search-inp"
+              type="text"
+              v-model="state.querys[i - 1]"
+              :placeholder="`query${i}`"
+            />
+            <button @click="search" id="search-btn">
+              <span class="iconfont icon-refresh"></span>refresh/search
+            </button>
+          </fieldset>
+        </section>
+      </nav>
+      <main>
+        <div class="loading-mask" :class="loading ? 'show' : ''">
+          Loading...
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th @click="cleanSelect">
+                <span class="iconfont icon-checkbox"></span>选择
+              </th>
+              <th><span class="iconfont icon-state"></span>状态</th>
+              <th><span class="iconfont icon-folder"></span>Profile文件夹名</th>
+              <th><span class="iconfont icon-custom-user"></span>用户名</th>
+              <th><span class="iconfont icon-custom-user"></span>默认用户名</th>
+              <th><span class="iconfont icon-email"></span>邮箱</th>
+              <th><span class="iconfont icon-link"></span>URL</th>
+              <th><span class="iconfont icon-title"></span>标题</th>
+              <th><span class="iconfont icon-count"></span>访问次数</th>
+              <th><span class="iconfont icon-date"></span>最后访问时间</th>
+              <th><span class="iconfont icon-date"></span>最后访问距今(天)</th>
+              <th><span class="iconfont"></span>禁用/启用</th>
             </tr>
-          </template>
+          </thead>
+          <tbody>
+            <template
+              v-for="item in filteredData"
+              :key="item.browser.profile_dir"
+            >
+              <tr
+                @click="openChrome(item.browser, link || state.openLink)"
+                v-for="(link, idx) in item.computedLinks"
+                :key="link.id"
+                class="row"
+                :class="getRowStateTypeStyle(item.lastLink, item.email)"
+              >
+                <td @click.stop>
+                  <input type="checkbox" v-model="item.checked" />
+                </td>
+                <td>
+                  <span v-if="idx === 0" class="state"
+                    >{{ getRowStateTypeText(item.lastLink) }}</span
+                  >
+                </td>
+                <td>{{item.browser.profile_dir}}</td>
+                <td>{{item.browser.username}}</td>
+                <td>{{item.browser.default_name}}</td>
+                <td class="info-text ellipsis email">{{item.browser.email}}</td>
+                <td class="url-text ellipsis">{{link.url || '-' }}</td>
+                <td class="info-text ellipsis">{{link.title}}</td>
+                <td>{{link.visit_count}}</td>
+                <td>{{link.last_visit_time}}</td>
+                <td>{{link.last_visit_day_since_now}}</td>
+                <td class="enable" @click.stop="handleDisableAccount(item)">
+                  <button>
+                    {{ disabledAccounts.includes(item.email) ? '启用' : '禁用'
+                    }}
+                  </button>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </main>
+    </div>
 
-        </tbody>
-      </table>
-    </main>
-  </div>
+    <script type="module">
+      // import { createApp, ref, computed } from './js/vue.esm-browser.js'
+      import { createApp, ref, computed, watch } from "./js/vue.esm-browser.js";
 
-  <script type="module">
-    // import { createApp, ref, computed } from './js/vue.esm-browser.js'
-    import { createApp, ref, computed } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
-    // 添加一个状态，需要修改 ROW_STATE、ROW_STATE_MAP、和 search 中的部分代码 还有 css
-    // 应该把状态的样式、优先级、文本内容全部放到一个 object 里面，状态判断用 object 提供的函数
-    const ROW_STATE = {
-      'ban': 200,
-      'unknown': 300,
-      'unavailable': 400,
-      'available': 500,
-      'recent': 600,
-    }
+      import useStateStore from "./js/stateStore.js";
+      import { openChrome, openChromeOneByOne } from "./js/chrome.js";
+      import { request, BASE_URL } from "./js/http.js";
+      import { ROW_STATE, ROW_STATE_MAP } from "./js/row.js";
+      import { disableAccount } from "./js/account.js";
 
-    const ROW_STATE_MAP = {
-      200: {
-        text: '封号',
-        style: 'ban'
-      },
-      300: {
-        text: '未知',
-        style: 'unknown'
-      },
-      400: {
-        text: '冷却中',
-        style: 'unavailable'
-      },
-      500: {
-        text: '可用',
-        style: 'available'
-      },
-      600: {
-        text: '近期使用',
-        style: 'recent'
-      },
-    }
+      createApp({
+        setup() {
+          const query = ref();
+          const data = ref([]);
 
-    const BASE_URL = 'http://127.0.0.1:8000/'
-    const request = (path, ...args) => {
-      if (typeof path === 'string') {
-        // 去掉路径开头的 /
-        path = path.replace(/^\/+/, '')
-        path = BASE_URL + path
-      }
+          const { state } = useStateStore();
+          // 被禁用账户的 email
+          const disabledAccounts = computed(() => {
+            return data.value
+              .filter((item) =>
+                state.value.disabledAccounts.includes(item.email)
+              )
+              .map((item) => item.email);
+          });
 
-      return fetch(path, ...args)
-    }
+          const filteredData = computed(() => {
+            return data.value.filter((item) => {
+              const isDisabledAccount = disabledAccounts.value.includes(
+                item.email
+              );
 
-    createApp({
-      setup() {
-        const query = ref('1loe1oaLI7_aUrTKsFwYW4OANJn2JhWKT')
+              if (!state.value.showBan && isDisabledAccount) {
+                return false;
+              }
 
-        const data = ref([])
-        const state = ref({
-          showUnavailable: false,
-          showAvailable: true,
-          showBan: false,
-          showUnknown: true,
-          accountRowCount: 1,
-          openCount: 1,
-          openLink: ""
-        })
+              if (
+                // 总是显示最近用过
+                item.lastLink.state_type === ROW_STATE.recent ||
+                (state.value.showUnavailable &&
+                  item.lastLink.state_type === ROW_STATE.unavailable) ||
+                (state.value.showUnknown &&
+                  item.lastLink.state_type === ROW_STATE.unknown) ||
+                // 禁用账户
+                (state.value.showBan && isDisabledAccount) ||
+                (state.value.showAvailable &&
+                  item.lastLink.state_type === ROW_STATE.available)
+              ) {
+                return true;
+              }
 
-        const filteredData = computed(() => {
-          return data.value.filter(item => {
-            // 总是显示最近用过
-            if (
-              item.lastLink.state_type === ROW_STATE.recent ||
-              (state.value.showUnavailable && item.lastLink.state_type === ROW_STATE.unavailable) ||
-              (state.value.showUnknown && item.lastLink.state_type === ROW_STATE.unknown) ||
-              (state.value.showBan && item.lastLink.state_type === ROW_STATE.ban) ||
-              (state.value.showAvailable && item.lastLink.state_type === ROW_STATE.available)
-            ) {
-              return true
+              return false;
+            });
+          });
+
+          const loading = ref(false);
+          const search = () => {
+            const { querys } = state.value;
+            if (!querys.length) {
+              alert("请输入要搜索的 URL");
+              return;
             }
 
-            return false
-          })
-        })
+            const url = new URL(BASE_URL);
+            url.searchParams.set("qs", querys.join("$$$"));
 
-        const loading = ref(false)
-        const search = () => {
-          if (!query.value) {
-            alert('请输入要搜索的 URL')
-            return
-          }
+            loading.value = true;
+            // 请求完成后，遍历 data 并给每个 item 挂上两个属性
+            // 1. computedLinks 联动 state.value.accountRowCount，每个账号的最大显示条数
+            // 2. lastLink item.links[0] 用户最后一次访问的链接信息
+            request(url, { signal: AbortSignal.timeout(20 * 1000) })
+              .then((resp) => resp.json())
+              .then((_data) => {
+                data.value = _data;
+                const default_link = {
+                  id: "-",
+                  url: "",
+                  title: "-",
+                  visit_count: "-",
+                  last_visit_time: "-",
+                  last_visit_day_since_now: -1,
+                };
 
-          const url = new URL(BASE_URL)
-          url.searchParams.set('qs', query.value)
+                data.value.forEach((item) => {
+                  // item['browser']['username'] = 'Test'
+                  // item['browser']['email'] = 'example@gmail.com'
+                  // item['browser']['default_name'] = 'Example'
+                  item.checked = false;
+                  item.email = item.browser.email;
 
-          loading.value = true
-          // 请求完成后，遍历 data 并给每个 item 挂上两个属性
-          // 1. computedLinks 联动 state.value.accountRowCount，每个账号的最大显示条数
-          // 2. lastLink item.links[0] 用户最后一次访问的链接信息
-          request(url).then(resp => resp.json()).then(_data => {
-            data.value = _data
-            const default_link = {
-              id: '-',
-              url: '',
-              title: '-',
-              visit_count: '-',
-              last_visit_time: '-',
-              last_visit_day_since_now: -1,
-            }
+                  item.lastLink = item.links.length
+                    ? item.links[0]
+                    : default_link;
+                  const { last_visit_day_since_now: last_day, id } =
+                    item.lastLink;
 
-            data.value.forEach(item => {
-              // item['browser']['username'] = 'Test'
-              // item['browser']['email'] = 'example@gmail.com'
-              // item['browser']['default_name'] = 'Example'
+                  item.computedLinks = computed(() => {
+                    const links = item.links.slice(
+                      0,
+                      state.value.accountRowCount
+                    );
 
-              item.lastLink = item.links.length ? item.links[0] : default_link
-              const { last_visit_day_since_now: last_day, id } = item.lastLink
+                    if (!links.length) {
+                      return [item.lastLink];
+                    }
 
-              item.computedLinks = computed(() => {
-                const links = item.links.slice(0, state.value.accountRowCount)
+                    return links;
+                  });
 
-                if (!links.length) {
-                  return [item.lastLink]
-                }
+                  for (const link of item.links) {
+                    link.last_visit_time = link.last_visit_time
+                      .replace("T", " ")
+                      .replace(/\.\d+/, "");
+                    // link["title"] = "Example"
+                  }
+                  if (id === "-") {
+                    // unknown
+                    item.lastLink.state_type = ROW_STATE.unknown;
+                  } else if (last_day >= 3) {
+                    // available
+                    item.lastLink.state_type = ROW_STATE.available;
+                  } else if (last_day < 3) {
+                    // 最近一天打开 : 冷却中
+                    item.lastLink.state_type =
+                      last_day <= 1 ? ROW_STATE.recent : ROW_STATE.unavailable;
+                  }
+                });
 
-                return links
+                // 根据状态排序，确保属性始终是：可用 -> 未知 -> 不可用 -> 禁用
+                data.value.sort((a, b) => {
+                  const { last_visit_day_since_now: al, state_type: as } =
+                    a.lastLink;
+                  const { last_visit_day_since_now: bl, state_type: bs } =
+                    b.lastLink;
+                  return bs - as;
+                });
               })
+              .finally(() => (loading.value = false));
+          };
 
-              for (const link of item.links) {
-                link.last_visit_time = link.last_visit_time.replace('T', ' ').replace(/\.\d+/, '')
-                // link["title"] = "Example"
+          search();
+
+          return {
+            search,
+            query,
+            data,
+            filteredData,
+            state,
+            loading,
+            openChrome,
+            openChromeOneByOne,
+            disabledAccounts,
+            handleDisableAccount(account) {
+              const accountsRef = state.value.disabledAccounts;
+              // 启用
+              let idx = disabledAccounts.value.indexOf(account.email);
+              if (idx > -1) {
+                accountsRef.splice(idx, 1);
+              } else {
+                accountsRef.push(account.email);
               }
-              if (id === '-') {
-                // unknown
-                item.lastLink.state_type = ROW_STATE.unknown
-              } else if (last_day >= 3) {
-                // available
-                item.lastLink.state_type = ROW_STATE.available
-              } else if (last_day < 3) {
-                // 最近一天打开 : 冷却中
-                item.lastLink.state_type = last_day <= 1 ? ROW_STATE.recent : ROW_STATE.unavailable
+            },
+            getRowStateTypeText(row) {
+              // console.log(row, ROW_STATE_MAP);
+              return ROW_STATE_MAP[row.state_type].text;
+            },
+            getRowStateTypeStyle(row, email) {
+              if (disabledAccounts.value.includes(email)) {
+                return "disabled";
               }
-
-              const test = ['appeal', 'need verify']
-              if (test.some(text => item.browser.username.includes(text))) {
-                item.lastLink.state_type = ROW_STATE.ban
-              }
-            })
-
-            // 根据状态排序，确保属性始终是：可用 -> 未知 -> 不可用 -> 封号
-            data.value.sort((a, b) => {
-              const { last_visit_day_since_now: al, state_type: as } = a.lastLink
-              const { last_visit_day_since_now: bl, state_type: bs } = b.lastLink
-              return bs - as
-            })
-          }).finally(() => loading.value = false)
-        }
-
-        search()
-
-        const openChrome = async (browser, link) => {
-          // if (link.state_type === ROW_STATE.unknown) {
-          //   return
-          // }
-          const { profile_dir } = browser
-          const url = link?.url || 'chrome://history/'
-          const resp = await request(`/open/${browser.profile_dir}?url=${url}`)
-          const result = await resp.json()
-        }
-
-        const openChromeOneByOne = async () => {
-          let openCount = 0
-          const openRows = data.value.filter(item => [ROW_STATE.available, ROW_STATE.unknown].includes(item.lastLink.state_type))
-
-          for (const { browser } of openRows) {
-            openCount++
-            await openChrome(browser, { url: state.value.openLink })
-
-            if (openCount >= state.value.openCount) {
-              break
-            }
-          }
-        }
-
-        return {
-          search,
-          query,
-          data,
-          filteredData,
-          state,
-          loading,
-          openChrome,
-          openChromeOneByOne,
-          getRowStateTypeText(row) {
-            // console.log(row, ROW_STATE_MAP);
-            return ROW_STATE_MAP[row.state_type].text
-          },
-          getRowStateTypeStyle(row) {
-            // console.log(row, ROW_STATE_MAP);
-            return ROW_STATE_MAP[row.state_type].style
-          }
-        }
-      }
-    }).mount('#app')
-  </script>
-</body>
-
+              // console.log(row, ROW_STATE_MAP);
+              return ROW_STATE_MAP[row.state_type].style;
+            },
+            cleanSelect() {
+              data.value.forEach((item) => {
+                console.log(item);
+                item.checked = false;
+              });
+            },
+          };
+        },
+      }).mount("#app");
+    </script>
+  </body>
 </html>
