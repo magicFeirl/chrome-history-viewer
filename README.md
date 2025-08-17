@@ -18,6 +18,7 @@
 
 Windows 下点击 run.bat 会自动打开前端网页和后端；或者手动打开 html/index.html 和运行 `python backend/app.py`，项目根目录下的 main.py 用于导出 csv
 
+如果没有数据，则修改 `backend\config.py`
 
 **Screenshot**
 
