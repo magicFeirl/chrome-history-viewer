@@ -31,6 +31,24 @@ def load_config_file(config_file):
     return cache[config_file]
 
 
+def create_link_description(id, url, title, visit_count=1, last_visit_time=None):
+    now = datetime.now()
+    last_visit_time = last_visit_time or now
+
+    return {
+        "id": id,
+        "url": url,
+        "title": title,
+        "visit_count": visit_count,
+        # typed_count: row[4]
+        "last_visit_time": last_visit_time,
+        "last_visit_day_since_now": round(
+            (now - last_visit_time).total_seconds() / 60 / 60 / 24,
+            2,
+        ),
+    }
+
+
 def find_link_last_visit_time(link_parts: List[str]):
     chrome_data_dir = config.CHROME_DATA_DIR
     profiles = glob(os.path.join(chrome_data_dir, "Profile *"))
@@ -87,27 +105,16 @@ def find_link_last_visit_time(link_parts: List[str]):
             print("Execute:", sql)
 
             cursor.execute(sql)
-            now = datetime.now()
 
             for row in cursor.fetchall():
                 last_visit_time = chrome_time_to_datetime(row[5])
-
+                id_url_title_vist_count = [row[i] for i in range(4)]
                 links.append(
-                    {
-                        "id": row[0],
-                        "url": row[1],
-                        "title": row[2],
-                        "visit_count": row[3],
-                        # typed_count: row[4]
-                        "last_visit_time": last_visit_time,
-                        "last_visit_day_since_now": round(
-                            (now - last_visit_time).total_seconds() / 60 / 60 / 24,
-                            2,
-                        ),
-                    }
+                    create_link_description(*id_url_title_vist_count, last_visit_time)
                 )
 
         except sqlite3.OperationalError as e:
+            links.append(create_link_description(-1, "", "占用中", 0))
             print(e)
         finally:
             history_db.close()
