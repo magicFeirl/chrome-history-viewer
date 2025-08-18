@@ -10,6 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "vite": "vite"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",

@@ -189,6 +189,11 @@
 
       .url-text {
         max-width: 6rem;
+        transition: 0.2s ease;
+      }
+
+      .url-text:hover {
+        color: #00aeeb;
       }
 
       .info-text {
@@ -382,7 +387,7 @@
               :key="item.browser.profile_dir"
             >
               <tr
-                @click="openChrome(item.browser, link || state.openLink)"
+                @click="openChrome(item.browser, state.openLink)"
                 v-for="(link, idx) in item.computedLinks"
                 :key="link.id"
                 class="row"
@@ -400,7 +405,12 @@
                 <td>{{item.browser.username}}</td>
                 <td>{{item.browser.default_name}}</td>
                 <td class="info-text ellipsis email">{{item.browser.email}}</td>
-                <td class="url-text ellipsis">{{link.url || '-' }}</td>
+                <td
+                  class="url-text ellipsis"
+                  @click.stop="openChrome(item.browser, link)"
+                >
+                  {{link.url || '-' }}
+                </td>
                 <td class="info-text ellipsis">{{link.title}}</td>
                 <td>{{link.visit_count}}</td>
                 <td>{{link.last_visit_time}}</td>

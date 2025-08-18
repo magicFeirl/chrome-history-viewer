@@ -52,7 +52,8 @@ def create_link_description(id, url, title, visit_count=1, last_visit_time=None)
 def find_link_last_visit_time(link_parts: List[str]):
     chrome_data_dir = config.CHROME_DATA_DIR
     profiles = glob(os.path.join(chrome_data_dir, "Profile *"))
-
+    profiles.append(os.path.join(chrome_data_dir, 'Default'))
+    
     results = []
     for dir in profiles:
         dirname = os.path.basename(dir)
