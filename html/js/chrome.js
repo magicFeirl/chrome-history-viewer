@@ -1,4 +1,5 @@
 import { request, BASE_URL } from './http.js'
+import { ROW_STATE } from './row.js'
 
 export const openChrome = async (browser, link) => {
     // if (link.state_type === ROW_STATE.unknown) {
@@ -12,20 +13,20 @@ export const openChrome = async (browser, link) => {
     const result = await resp.json();
 };
 
-export const openChromeOneByOne = async () => {
+export const openChromeOneByOne = async (data, openLink, openCount) => {
     const autoOpen = async () => {
-        let openCount = 0;
-        const openRows = data.value.filter((item) =>
+        let count = 0;
+        const openRows = data.filter((item) =>
             [ROW_STATE.available, ROW_STATE.unknown].includes(
                 item.lastLink.state_type
             )
         );
-
+        console.log(openRows)
         for (const { browser } of openRows) {
-            openCount++;
-            await openChrome(browser, { url: state.value.openLink });
+            count++;
+            await openChrome(browser, { url: openLink });
 
-            if (openCount >= state.value.openCount) {
+            if (count >= openCount) {
                 break;
             }
         }
@@ -33,11 +34,11 @@ export const openChromeOneByOne = async () => {
 
     const selectOpen = async (rows) => {
         for (const { browser } of rows) {
-            await openChrome(browser, { url: state.value.openLink });
+            await openChrome(browser, { url: openLink });
         }
     };
 
-    const selectRows = data.value.filter((item) => item.checked);
+    const selectRows = data.filter((item) => item.checked);
     // 有勾选打开则使用勾选的 Profile
     if (selectRows.length) {
         selectOpen(selectRows);

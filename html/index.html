@@ -285,7 +285,7 @@
     <div id="app">
       <nav>
         <header>
-          <span class="title">Colab Usage Viewer</span>
+          <span class="title">Colab Usage Viewer ({{ filteredData.length }})</span>
           <div style="flex: 1"></div>
           <fieldset>
             <label for="hide-available">显示可用</label>
@@ -338,8 +338,10 @@
               type="text"
               v-model="state.openLink"
             />
-            <button @click="openChromeOneByOne">打开</button>
+            <button @click="openChromeOneByOne(filteredData, state.openLink, state.openCount)">打开</button>
           </fieldset>
+          <fieldset>
+            <button @click="handleLiveCheck">存活检查</button>
         </header>
         <section class="filter">
           <fieldset>
@@ -353,7 +355,7 @@
               :placeholder="`query${i}`"
             />
             <button @click="search" id="search-btn">
-              <span class="iconfont icon-refresh"></span>refresh/search
+              <span class="iconfont icon-refresh"></span>搜索
             </button>
           </fieldset>
         </section>
@@ -436,7 +438,7 @@
       import { openChrome, openChromeOneByOne } from "./js/chrome.js";
       import { request, BASE_URL } from "./js/http.js";
       import { ROW_STATE, ROW_STATE_MAP } from "./js/row.js";
-      import { disableAccount } from "./js/account.js";
+      import { liveCheck } from "./js/account.js";
 
       createApp({
         setup() {
@@ -497,7 +499,7 @@
             // 请求完成后，遍历 data 并给每个 item 挂上两个属性
             // 1. computedLinks 联动 state.value.accountRowCount，每个账号的最大显示条数
             // 2. lastLink item.links[0] 用户最后一次访问的链接信息
-            request(url, { signal: AbortSignal.timeout(20 * 1000) })
+            request(url, { signal: AbortSignal.timeout(60 * 1000) })
               .then((resp) => resp.json())
               .then((_data) => {
                 data.value = _data;
@@ -579,6 +581,9 @@
             openChrome,
             openChromeOneByOne,
             disabledAccounts,
+            handleLiveCheck() {
+              liveCheck(data.value.map(item => item.email))
+            },
             handleDisableAccount(account) {
               const accountsRef = state.value.disabledAccounts;
               // 启用
