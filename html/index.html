@@ -588,11 +588,13 @@
               const accountsRef = state.value.disabledAccounts;
               // 启用
               let idx = disabledAccounts.value.indexOf(account.email);
+              console.log(idx)
               if (idx > -1) {
-                accountsRef.splice(idx, 1);
+                accountsRef.splice(idx - 1, 1);
               } else {
                 accountsRef.push(account.email);
               }
+              console.log(accountsRef)
             },
             getRowStateTypeText(row) {
               // console.log(row, ROW_STATE_MAP);
