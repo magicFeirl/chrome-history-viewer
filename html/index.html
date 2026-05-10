@@ -342,6 +342,8 @@
           </fieldset>
           <fieldset>
             <button @click="handleLiveCheck">存活检查</button>
+            <button @click="handleBatchDisable" style="margin-left:4px;background-color:rgb(180,30,30)">批量禁用</button>
+        </fieldset>
         </header>
         <section class="filter">
           <fieldset>
@@ -400,7 +402,7 @@
                 </td>
                 <td>
                   <span v-if="idx === 0" class="state"
-                    >{{ getRowStateTypeText(item.lastLink) }}</span
+                    >{{ getRowStateTypeText(item.lastLink, item.email) }}</span
                   >
                 </td>
                 <td>{{item.browser.profile_dir}}</td>
@@ -584,6 +586,18 @@
             handleLiveCheck() {
               liveCheck(data.value.map(item => item.email))
             },
+            handleBatchDisable() {
+              const input = prompt('请输入要批量禁用的邮箱，多个邮箱用英文逗号 , 分隔：');
+              if (!input) return;
+              const emails = input.split(',').map(e => e.trim()).filter(Boolean);
+              if (!emails.length) return;
+              const accountsRef = state.value.disabledAccounts;
+              emails.forEach(email => {
+                if (!accountsRef.includes(email)) {
+                  accountsRef.push(email);
+                }
+              });
+            },
             handleDisableAccount(account) {
               const accountsRef = state.value.disabledAccounts;
               // 启用
@@ -596,8 +610,10 @@
               }
               console.log(accountsRef)
             },
-            getRowStateTypeText(row) {
-              // console.log(row, ROW_STATE_MAP);
+            getRowStateTypeText(row, email) {
+              if (disabledAccounts.value.includes(email)) {
+                return "禁用";
+              }
               return ROW_STATE_MAP[row.state_type].text;
             },
             getRowStateTypeStyle(row, email) {
